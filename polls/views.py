@@ -54,7 +54,7 @@ def getPostPage(request, pk):
         try:
             post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
         except LoginRequiredException: 
-                L.login("SocialAnalysis010", "progettoreti2020")
+                L.login("socialanalysiscld", "progettocloud123.")
                 post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
 
         if post.likes != postDB.nLikes:
@@ -78,7 +78,7 @@ def getPostPage(request, pk):
         try:
             post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
         except LoginRequiredException: 
-                L.login("SocialAnalysis010", "progettoreti2020")
+                L.login("socialanalysiscld", "progettocloud123.")
                 post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
         allComments = post.get_comments()
         for comment in allComments:
@@ -112,22 +112,6 @@ def getPostPage(request, pk):
 
         }
         return render(request, "polls/post.html", context)
-    nuoviCommenti=False
-    postDB = get_object_or_404(Post, pk=pk)
-    L = instaloader.Instaloader()
-    post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
-    if post.likes != postDB.nLikes:
-            postDB.totalLikes = post.likes
-    if postDB.nComments != post.comments:
-            nuoviCommenti = True
-    postDB.save()
-    print("Sono in post page")
-    context = {
-        "post": postDB,
-        "nuoviCommenti": nuoviCommenti    
-    }
-
-    return render(request, "polls/post.html", context)
 
 
 def getProfile(request, pk):
@@ -305,8 +289,11 @@ def insert(request): # aggiungere la data da cui scaricare i post
 def insertInProfile(request, profile): # aggiungere la data da cui scaricare i post
     p = Profile.objects.get(username=profile)
     #L = instaloader.Instaloader()
-    L.login("SocialAnalysis010", "progettoreti2020")
-    profile = instaloader.Profile.from_username(L.context, p.username)
+    try:
+        profile = instaloader.Profile.from_username(L.context, p.username)
+    except LoginRequiredException: 
+        L.login("socialanalysiscld", "progettocloud123.")
+        profile = instaloader.Profile.from_username(L.context, p.username)
     #
     #L = instaloader.Instaloader()
     
@@ -355,8 +342,11 @@ def insertInProfile(request, profile): # aggiungere la data da cui scaricare i p
 
 def updateNewPost(request, profile):
     p = Profile.objects.get(username=profile)
-    #L.login("SocialAnalysis010", "progettoreti2020")
-    profile = instaloader.Profile.from_username(L.context, p.username)
+    try:
+        profile = instaloader.Profile.from_username(L.context, p.username)
+    except LoginRequiredException: 
+        L.login("socialanalysiscld", "progettocloud123.")
+        profile = instaloader.Profile.from_username(L.context, p.username)
 
     p.allPost = profile.mediacount
 
@@ -400,7 +390,11 @@ def checkIfExistInDB(usernameP):
 def savePost(q, dates):
     #L = instaloader.Instaloader()
     #L.login("SocialAnalysis010", "progettoreti2020")
-    profile = instaloader.Profile.from_username(L.context, q)
+    try:
+        profile = instaloader.Profile.from_username(L.context, q)
+    except LoginRequiredException: 
+        L.login("socialanalysiscld", "progettocloud123.")
+        profile = instaloader.Profile.from_username(L.context, q)
     SINCE = datetime(int(dates), 12, 31)
     UNTIL = datetime(int(dates), 1, 1)
     likes = 0
@@ -428,11 +422,11 @@ def delete(request, profile_id):
 
 def updateNuoviCommenti(request, post_id):
         limit = 1
-        L.login("SocialAnalysis010", "progettoreti2020")
         postDB = Post.objects.get(id=post_id)
         try:
             post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
         except LoginRequiredException: 
+                L.login("socialanalysiscld", "progettocloud123.")
                 post = instaloader.Post.from_shortcode(L.context, postDB.uriPost) 
         all_id_socail = All_Social_Id.objects.values_list('an_id_social', flat=True)
         allComments = post.get_comments()
@@ -485,17 +479,3 @@ def remove_emoji(string):
                            u"\U000024C2-\U0001F251"
                            "]+", flags=re.UNICODE)
     return emoji_pattern.sub(r'', string)
-
-
-'''def get_similar_username_profile(request):
-    username = request.GET.get('username', None)
-    L.login("SocialAnalysis010", "progettoreti2020")
-    n = TopSearchResults(L.context, username)
-    name = []
-    for i in n.get_profiles():
-        name.append(i.username)
-
-    jsonString = json.dumps(name[-5:])
-    print(jsonString)
-    L.close()
-    return response.HttpResponse(jsonString)'''
