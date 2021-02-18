@@ -32,7 +32,8 @@ DATABASES = {
         'NAME': os.environ['DBNAME'],
         'HOST': hostname + ".postgres.database.azure.com",
         'USER': os.environ['DBUSER'] + "@" + hostname,
-        'PASSWORD': os.environ['DBPASS'],
+        #'PASSWORD': os.environ['DBPASS'],
+        'PASSWORD': "Lamiapassword123.",
         'OPTIONS': {'sslmode': 'require'}
  
     }
