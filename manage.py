@@ -4,7 +4,7 @@ import os
 import sys
 
 
-def main():
+if __name__ == '__main__':
     """Run administrative tasks."""
     settings_module = "SocialNetworkAnalyticsCloud.production" if 'WEBSITE_HOSTNAME' in os.environ else 'SocialNetworkAnalyticsCloud.settings'
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
@@ -17,8 +17,8 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
-    main()
+
