@@ -78,12 +78,8 @@ WSGI_APPLICATION = 'SocialNetworkAnalyticsCloud.wsgi.application'
 #postgres://pasquale1211%40socialanalysisserver:IPAD0tt%40v%40g3n3r%40z10n3.@socialanalysisserver.postgres.database.azure.com:5432/SocialAnalysisDB
 DATABASES = {# LOCAL DB
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'SocialAnalysisDB',
-        'USER': 'postgres',
-        'PASSWORD': 'lamiapassword',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
