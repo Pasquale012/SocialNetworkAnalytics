@@ -13,7 +13,7 @@ from django.core.wsgi import get_wsgi_application
 
 #os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SocialAnalysisCLOUD.settings')
 
-settings_module = "SocialAnalysisCLOUD.production" if 'WEBSITE_HOSTNAME' in os.environ else 'SocialAnalysisCLOUD.settings'
+settings_module = "SocialNetworkAnalyticsCloud.production" if 'WEBSITE_HOSTNAME' in os.environ else 'SocialNetworkAnalyticsCloud.settings'
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', settings_module)
 
 application = get_wsgi_application()
