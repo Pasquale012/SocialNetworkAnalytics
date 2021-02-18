@@ -1,0 +1,10 @@
+.test{
+    width: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#slidValues{
+    flex: 0 0 auto;
+}

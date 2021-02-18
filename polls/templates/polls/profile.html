@@ -1,0 +1,206 @@
+{% extends 'polls/base.html' %}
+{% load humanize %}
+
+{%load static%}
+
+{%block content%}
+  
+   <!-- ***** Features Big Item Start ***** -->
+    <section class="section padding-top-70 padding-bottom-0 " id="features">
+        <div class="container">
+            <div class="row" style="margin-top: 100px;">
+                <div class="col-lg-5 col-md-12 col-sm-12 align-self-center" data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                    <img src={% static '/images/default-profile.png' %} class="rounded img-fluid d-block mx-auto" alt="App">
+                </div>
+                <div class="col-lg-1"></div>
+                <div class="col-lg-6 col-md-12 col-sm-12 align-self-center mobile-top-fix">
+                    <div class="left-heading text-center">
+                        <h1 style="font-size:35px" class="section-title"><strong>{{profile.username}}</strong></h1>
+                    </div>
+                    <div class="left-text text-center" style="font-size:25px">
+                        <p><strong>{{profile.followers|intword}}</strong> <small>Followers {% if newOrLostFollowers < 0 %}
+                                                                                    <strong style="color:red;">{{newOrLostFollowers|intword}}</strong>
+                                                                                    {% elif newOrLostFollowers > 0%} 
+                                                                                    <strong style="color:green;">+{{newOrLostFollowers|intword}}</strong>
+                                                                                    {% endif %}
+                                                                                    </small> <strong>{{profile.followees|intword}}</strong> <small>Followees</small>
+                                                                                    </small> <strong>{{profile.allPost|intword}}</strong> <small>Posts</small><br><br>
+                                                                                    <small style="color:green">Positive: <strong>{{profile.avgPositiveSentiment|stringformat:".2f"}}</strong></small>
+                                                                                    <small>Neutral: <strong>{{profile.avgNeutralSentiment|stringformat:".2f"}}</strong></small>
+                                                                                    <small style="color:red">Negative: <strong>{{profile.avgNegativeSentiment|stringformat:".2f"}}</strong></small></p>
+                                                                                    
+                    </div>
+                    {% ifequal dateMancanti "NOTALL"%} <!--Questo profilo è privato!-->
+                        <div class="left-text text-center" style="font-size:20px">
+                            <p style="margin-bottom: 0; margin-top: 15px;"><small class="">Questo profilo è privato!<br></small></p>
+                            <a href="{% url 'polls:insertInProfile' profile.username %}"><button type="submit" class="btn btn-success">🔓 Controlla se non lo è più</button></a>
+                        </div>
+                    {% endifequal %}
+                    {%if dateMancanti != "ALL" and dateMancanti != "NOTALL"%}<!--Questo profilo è privato!-->
+                            <div class="left-text text-center" style="font-size:20px">
+                                <p style="margin-bottom: 0; margin-top: 15px;"><small class="">Questo profilo contiene post relativi a queste date: <br>{{profile.nDatePostSaved}}<br></small></p>
+                                <form action="{% url 'polls:insertInProfile' profile.username%}" method="post"> 
+                                {% csrf_token %}
+                                <small style="font-size:15px;">Seleziona altre date!</small><br>
+                                    {% for date in dateMancanti %}
+                                        <label class="checkbox-inline"><input type="checkbox" id="{{date}}" name="checkYear" value="{{date}}" style="margin-left:10px;"><small style="margin-left:5px;margin-right:5px; color:#777">{{date}}</small></label>
+                                    {% endfor %}
+                                <button type="submit" class="btn btn-success">Update</button>
+                                </form>
+                            </div>
+                    {% endif %}
+                            {%if dateMancanti == "ALL" and dateMancanti != "NOTALL"%}
+                            <div class="left-text text-center" style="font-size:20px">
+                                <p style="margin-bottom: 0; margin-top: 15px;"><small class="">Questo profilo contiene tutti post!</small></p>
+                            {% endif %}
+                        </div>
+                                           
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="hr"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Features Big Item End ***** -->
+
+    
+    <!-- ***** Counter Parallax Start ***** -->
+    <section class="counter">
+        <div class="content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <div class="count-item decoration-bottom">
+                            <strong>{{profile.postContacts}}</strong>
+                            <span>Post Analizzati</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    {% ifequal averangeLikes 0 %}
+                        <div class="no-count-item decoration-top">
+                            <strong id="noLikesData">No Post</strong>
+                            <span>Media Like per Post</span>
+                        </div>
+                    {% else %}
+                        <div class="count-item decoration-top">
+                            <strong id="noLikesData">{{averangeLikes|intcomma}}</strong>
+                            <span>Media Like per Post</span>
+                        </div>
+                    {% endifequal %}
+                    </div>
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    {% ifequal averangeComments 0 %}
+                        <div class="no-count-item decoration-top">
+                            <strong id="noLikesData" >No Post</strong>
+                            <span>Media Like per Post</span>
+                        </div>
+                    {% else %}
+                        <div class="count-item decoration-top">
+                            <strong id="noLikesData">{{averangeComments|intcomma}}</strong>
+                            <span>Media Commenti per Post</span>
+                        </div>
+                    {% endifequal %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Counter Parallax End ***** -->  
+
+    <!-- ***** Pricing Plans Start ***** -->
+    <section class="section colored" id="pricing-plans">
+        <div class="container">
+            <!-- ***** Section Title Start ***** -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="center-heading">
+                        <h2 class="section-title">Posts {% if UltimoAnnoOK %}{% if newPost %}<br><small>Sono presenti <strong>{{totNuoviPost}}</strong> nuovi Post dall'ultima analisi, vuoi aggiornare? -></small> <a href="{% url 'polls:updateNewPost' profile.username %}">🔄</a>{% endif %}{% endif %}</h2>
+                    </div>
+                </div>
+                <div class="offset-lg-3 col-lg-6">
+                    <div class="center-text">
+                        <p>Ecco qui elencati tutti i post del profilo selezionato, cliccandoci sopra puoi accedere al post leggere i commenti!</p>
+                    </div>
+                </div>
+            </div>
+            <!-- ***** Section Title End ***** -->
+
+            <div class="row">
+                <!-- ***** Pricing Item Start ***** -->
+                {% for post in post_page.object_list %}
+                <div class="col-lg-4 col-md-6 col-sm-12" data-scroll-reveal="enter bottom move 50px over 0.6s after 0.2s">
+                    <div class="pricing-item "> <!--active-->
+                        <div class="pricing-header ">
+                        </div>
+                        <div class="pricing-body">
+                            <div class="price-wrapper">
+                                <span class="price" >{{post.uriPost}}</a></span>
+                            </div>
+                            <div class="pricing-body">
+                            <ul class="list">
+                                <li class="active">{{post.bioPost}}</li>
+                            </ul>
+                        </div>
+                            <div class="count-item decoration-bottom text-center">
+                                        <strong>{{post.nLikes}}</strong>
+                                        <p style="display:inline">Mi Piace</p>
+                                        <strong>{{post.nComments}}</strong>
+                                        <p style="display:inline">Commenti</p>
+                            </div>
+                            <div class="decoration-bottom text-center">
+                                    <strong>
+                                        {%if post.avgSentiment < 0.5 %}<span style="color:red">{{post.avgSentiment|stringformat:".2f"}}</span>
+                                        {% elif post.avgSentiment == 0.5 %}<span style="color:yellow">{{post.avgSentiment|stringformat:".2f"}}</span>
+                                        {% else %}<span style="color:green">{{post.avgSentiment|stringformat:".2f"}}</span>
+                                        {% endif %}
+                                    </strong>
+                                        <p style="display:inline">Sentiment del Post</p>
+                            </div>
+                        </div>
+                        <div class="pricing-footer">
+                            <a href="{% url 'polls:post' post.id %}" class="main-button">Go to post</a> <!--pagina del post + commenti e FUNCTION APP-->
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if post_page.paginator.num_pages > 1 %}
+            <div class="pagination d-flex justify-content-center text-center margin-top-10">
+                <span class="step-links">
+                    {% if post_page.has_previous %}
+                        <!--<a href="?page=1"><button type="button" class="btn btn-primary">&laquo; First Page</button></a>
+                        <a href="?page={{ post_page.previous_page_number }}"><button type="button" class="btn btn-primary">Previous</button></a>-->
+                        <a href="?page=1"><button type="button" class="btn btn-primary">&laquo; First Page</button></a>
+                        <a href="?page={{ post_page.previous_page_number }}"><button type="button" class="btn btn-primary">Previous</button></a>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" disabled>&laquo; First Page</button>
+                        <button type="button" class="btn btn-primary" disabled>Previous</button>
+                    {% endif %}
+
+                    <span class="current" style="font-size:20px">
+                        Page <strong style="font-size:25px">{{ post_page.number }}</strong> of <strong style="font-size:25px">{{ post_page.paginator.num_pages }}</strong>.
+                    </span>
+
+                    {% if post_page.has_next %}
+                        <a href="?page={{ post_page.next_page_number }}"><button type="button" class="btn btn-primary">Next</button></a>
+                        <a href="?page={{ post_page.paginator.num_pages }}"><button type="button" class="btn btn-primary">Last &raquo;</button></a>
+                    {% else %}
+                        <button type="button" class="btn btn-primary" disabled>Next</button>
+                        <button type="button" class="btn btn-primary" disabled>Last &raquo;</button>
+                    {% endif %}
+                </span>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+    <!-- ***** Pricing Plans End ***** -->
+{%endblock%}
+
+{% block scripts %}
+    <!-- block.super will get the content of the block from the parent template -->
+    {{ block.super }}
+    <script src="{% static '/js/profile.js' %}"></script>
+{% endblock %}

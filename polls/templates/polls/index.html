@@ -1,0 +1,186 @@
+{% extends 'polls/base.html' %}
+{% load static %}
+{% load humanize %}
+
+
+{% block content%}
+
+
+    {% if profilo_non_trovato %}
+    <!-- Modal -->
+    <div class="modal fade show" id="exampleModalCenter" role="dialog" aria-labelledby="exampleModalCenterTitle" style="display:block">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Nessun utente trovato!</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            Mi dispiace ma non è stato trovato nessun utente!<br> Prova con un altro username!
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="modalBYE" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            
+        </div>
+        </div>
+    </div>
+    </div>
+    {% endif %}
+    <!-- ***** Welcome Area Start ***** -->
+    <div class="welcome-area" id="welcome">
+            <div class="header-text">
+                <div class="container">
+                    <div class="row">
+                        <div class="offset-xl-3 col-xl-6 offset-lg-2 col-lg-8 col-md-12 col-sm-12">
+                            <h1><strong>Inserisci qui</strong> il nome utente del profilo che vuoi <strong>analizzare</strong>!</h1>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+            <div class="row">
+
+                <!-- ***** Contact Form Start ***** -->
+                <div class="col-lg-12">
+                    <div class="welcome-form">
+                        <form  action="{% url 'polls:insert' %}" method="post">
+                            {% csrf_token %}
+                          <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                              <fieldset>
+                                <input name="name" id="username" type="text" class="form-control" placeholder="Full Name" required="">
+                              </fieldset>
+                            </div>
+                            </div>
+                            <div class="info col-lg-12 col-md-12 col-sm-12 ">
+                                <p class="text-center" style="color:#fff">Quali date hai intenzione di analizzare?</p>     
+                            </div>
+                            <div class="container-fluid">
+                                <div class="row justify-content-center year" >
+                                     <label class="checkbox-inline"></label>
+                                     <label class="checkbox-inline"></label>                                     
+                                     <label class="checkbox-inline"></label>
+                                     <label class="checkbox-inline"></label>
+                                     <label class="checkbox-inline"></label>
+                                     <label class="checkbox-inline"></label>
+                                     <label class="checkbox-inline"></label>
+                                     <label class="checkbox-inline"></label>
+                                     <label class="checkbox-inline"></label>
+                                     <label class="checkbox-inline"></label>
+                           </div>
+                            </div>
+                            <div class="row">
+                            <div class="col-lg-12 text-center">
+                              <fieldset>
+                                <button type="submit" class="main-button">Analyze!</button>
+                              </fieldset>
+                            </div>
+                          </div>
+                        </form>
+                    </div>
+                </div>
+            </div>        
+     </div>
+    <!-- ***** Welcome Area End ***** -->
+    
+    <!-- ***** Features Small Start ***** -->
+    <section class="section home-feature" id="accounts">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row">
+                        {% if lastest_profile_list %}
+                            {% for profile in lastest_profile_list %}
+                            <!-- ***** Features Small Item Start ***** -->
+                            <div class="col-lg-4 col-md-6 col-sm-6 col-12" data-scroll-reveal="enter bottom move 50px over 0.6s after 0.2s">
+                                
+                                <div class="features-small-item">
+                                    <a href="{% url 'polls:profile' profile.id %}"><div class="icon">
+                                        <i><img src={% static '/images/default-profile.png' %} alt=""></i>
+                                    </div></a>
+                                    <h5 class="features-title" {% if profile.username|length > 20 %} style="font-size:15px"{% endif %}>{% ifequal profile.isPrivate True %}{{profile.username}} 🔒{% else %}{{profile.username}}{% endifequal %}</h5>
+                                    <div class="count-item decoration-bottom">
+                                        <strong>{{profile.followers|intcomma}}</strong>
+                                        <p style="display:inline">Followers</p><br>
+                                        <strong>{{profile.followees}}</strong>
+                                        <p style="display:inline">Followees</p><br>
+                                        <p><a href="{% url 'polls:delete' profile.id %}">Elimina</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                                {% endfor %}
+                            {%endif%}
+                        <!-- ***** Features Small Item End ***** -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Features Small End ***** -->
+
+    <!-- ***** Features Big Item Start ***** -->
+    <section class="section padding-top-20 padding-bottom-0" id="features">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="hr"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ***** Features Big Item End ***** -->
+
+    <!-- ***** Testimonials Start COMMENTI***** -->
+    <section class="section" id="testimonials">
+        <div class="container">
+            <!-- ***** Section Title Start ***** -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="center-heading">
+                        <h2 class="section-title">Vuou confrontare i dati analizzati dai vari profili?</h2>
+                    </div>
+                </div>
+                <div class="offset-lg-3 col-lg-6">
+                    <div class="center-text">
+                        <p>Scegliendo uno o più profili qui sotto elencati sarà possibile visionare un confronto dei dati tramite grafici.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid" >
+                <div class="row justify-content-center" >
+                    <label class="checkbox-inline"><input checked onchange="getTypeGraph(this)" type="checkbox" id="Likes" name="Likes" value="Likes" style="margin-left:10px;"><small style="margin-left:5px;margin-right:10px;">Grafico Likes</small></label>
+                    <label class="checkbox-inline"><input onchange="getTypeGraph(this)" type="checkbox" id="Comments" name="Comments" value="Comments" style="margin-left:10px;"><small style="margin-left:5px;margin-right:10px;">Grafio Commenti</small></label>
+                    <label class="checkbox-inline"><input onchange="getTypeGraph(this)" type="checkbox" id="Sentiment" name="Sentiment" value="Sentiment" style="margin-left:10px;"><small style="margin-left:5px;margin-right:10px;">Grafico Sentiment</small></label>
+                    <label class="checkbox-inline"><input onchange="getTypeGraph(this)" type="checkbox" id="Language" name="Language" value="Language" style="margin-left:10px;"><small style="margin-left:5px;margin-right:10px;">Grafico Language</small></label>
+
+                </div>
+                <div class="row justify-content-center" >
+                {% if lastest_profile_list %}
+                    {% for profile in lastest_profile_list %}
+                        <label class="checkbox-inline"><input onchange="makeLabelChart(this, {{profile.totalLikes}}, {{profile.postContacts}}, {{profile.totalComments}}, {{profile.avgPositiveSentiment|stringformat:".2f"}}, {{profile.avgNeutralSentiment|stringformat:".2f"}}, {{profile.avgNegativeSentiment|stringformat:".2f"}})" type="checkbox" id="cb{{forloop.counter}}" name="{{profile.username}}" value="{{profile.username}}" style="margin-left:10px;"><small style="margin-left:5px;margin-right:10px;">{{profile.username}}</small></label>
+                    {%endfor%}
+                {%endif%}
+                </div>
+
+            <!-- ***** Section Title End ***** -->
+            <div class="row" id="Grafico">
+                    <canvas class="col-lg-6" id="ChartLikes" width="400" height="400"></canvas>
+                    <canvas class="col-lg-6" id="ChartComments" width="400" height="400" style="visibility: hidden;"></canvas>
+                    <canvas class="col-lg-12 h-25" id="ChartSentiment" width="400" height="400" style="visibility: hidden;"></canvas>
+                    <!--<canvas class="col-lg-5" id="ChartLanguage" width="400" height="400" style="visibility: hidden;"></canvas>-->
+            </div>
+        </div>
+    </section>
+    <!-- ***** Testimonials End ***** -->
+
+
+
+{%endblock%}
+
+{% block scripts %}
+    <!-- block.super will get the content of the block from the parent template -->
+    {{ block.super }}
+    <script src="{% static '/js/index.js' %}"></script>
+{% endblock %}
+

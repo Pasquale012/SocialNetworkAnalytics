@@ -1,0 +1,127 @@
+{% extends 'polls/base.html' %}
+{%load static%}
+
+{% block content %}
+<section class="section padding-top-70 padding-bottom-0 " id="features">
+        <div class="container">
+            <div class="row" style="margin-top: 60px;">
+                <div class="col-lg-12 col-md-12 col-sm-12 align-self-center mobile-top-fix">
+                    <div class="left-text">
+                        <a href="{% url 'polls:profile' post.profile.id %}"><button type="button" class="btn btn-outline-info">&lt; {{post.profile}}</button></a>
+                    </div>  
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12 align-self-center" data-scroll-reveal="enter left move 30px over 0.6s after 0.4s">
+                    <img src={% static '/images/default-profile.png' %} class="rounded img-fluid d-block mx-auto" alt="App">
+                    <div class="left-heading text-center">
+                        <a class="text-center" href="https://www.instagram.com/p/{{post.uriPost}}/" target="_blank"><button type="button" class="btn btn-outline-primary">Guarda direttamente il post su Instagram! 📷</button></a>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-12 col-sm-12 align-self-center mobile-top-fix">
+                    <div class="left-heading text-center">
+                        <h1 style="font-size:35px" class="section-title"><strong>{{post.bioPost}}</strong></h1>
+                    </div>
+                    <div class="left-text text-center" style="font-size:25px">
+                        <p><small>👍</small> <strong>{{post.nLikes}}</strong> <small>💬</small> <strong>{{post.nComments}}</strong> </p>
+                    </div>
+                    {% if nuoviCommenti %}
+                        <div class="left-text text-center" style="font-size:20px">
+                            <p style="margin-bottom: 0; margin-top: 15px;"><small class="">Possono essere analizzati altri nuovi commenti!<br>Vuoi aggiornare e leggerli?</small></p>
+                            <a href="{% url 'polls:updateNuoviCommenti' post.id %}"><button type="submit" class="btn btn-success">💬 Update</button></a>
+                        </div>
+                    {% endif %}
+                    <div class="left-text text-center" style="font-size:20px">
+                        <!--<p style="margin-bottom: 0; margin-top: 15px;"><small>Media Sentiment Commenti:</small> {%if post.avgSentiment < 0.5 %}<span style="color:red"><strong>{{post.avgSentiment}}❤️</strong></span>
+                                                                                                                {% elif post.avgSentiment == 0.5 %}<span style="color:yellow"><strong>{{post.avgSentiment}}💛<strong></span>
+                                                                                                                {% else %} <span style="color:green"><strong>{{post.avgSentiment}}💔</strong></span>
+                                                                                                                {% endif %}</p>-->
+                        <p style="margin-bottom: 0; margin-top: 15px;"><small>Media Sentiment Commenti:<br></small> <span style="color:green" title="Positive Sentiment"><small>Positive Sentiment </small><strong>{%widthratio post.avgPositiveSentiment|stringformat:".2f" 1 100 %}% ❤️</strong></span></br>
+                                                                                                                <span style="color:grey" title="Neutral Sentiment"><small>Neutral Sentiment </small><strong>{%widthratio post.avgNeutralSentiment|stringformat:".2f" 1 100%}% 🤍</strong></span></br>
+                                                                                                                <span style="color:red" title="Negative Sentiment"><small>Negative Sentiment </small><strong>{%widthratio post.avgNegativeSentiment|stringformat:".2f" 1 100%}% 💔</strong></span>
+                                                                                                                </p>                                                                                        
+                        
+                    </div>
+                                           
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 align-self-center mobile-top-fix">
+                    <div class="left-heading text-center d-flex justify-content-center">
+                    </div>                                           
+                </div>
+            </div>
+                <div class="col-lg-12">
+                    <div class="hr"></div>
+                </div>
+           
+            <!-- ***** Testimonials Start ***** -->
+    <section class="section" id="testimonials" style="padding-top:20px">
+            <!-- ***** Section Title Start ***** -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="center-heading" style="margin-bottom:20px">
+                        <h2 class="section-title">Commenti ⬇️</h2>
+                        <p>Vengono riportati sotto i commenti con relativa analisi del sentiment.</p>
+                    </div>
+                </div>
+            <!-- ***** Section Title End ***** -->
+
+            <div class="row">
+            {% for comment in post.comments_set.all %}
+                <!-- ***** Testimonials Item Start ***** -->
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="team-item">
+                        <div class="team-content">
+                            <p>{{comment.comment_text}}</p>
+                            <div class="user-image">
+                                <img src={% static '/images/default-profile.png' %} class="rounded img-fluid d-block mx-auto" alt="App">
+                            </div>
+                            <div class="team-info">
+                                <h3 class="user-name">{{comment.owner}}</h3>
+                                <!--<span>{% if comment.sentiment > 0.5 %}{{comment.sentiment}} ❤️{% elif comment.sentiment >= 0.4 and comment.sentiment <= 0.5  %}{{comment.sentiment}} 💛 {% else %}{{comment.sentiment}} 💔{% endif %} {{comment.likesCount}}👍</span>-->
+                                  <span style="display:inline"><strong >{{comment.sentiment|upper}} ⬇️</STRONG> </span>    <span style="display:inline; margin-left:10px"> {{comment.likesCount}}👍 </span> 
+                                
+                            </div>
+                        </div>
+                        {% ifnotequal comment.sentiment|upper "NOT ANALYZED" %}
+                          <div style="margin-right: 30px;margin-left: 30px;margin-top: 5px;"class="progress">
+                                {% ifnotequal comment.positive 0 %}  <div title="{{comment.positive}}" class="progress-bar bg-success" role="progressbar" style="width: {%widthratio  comment.positive 1 100%}%" aria-valuenow="{%widthratio  comment.positive 1 100 %}" aria-valuemin="0" aria-valuemax="100"><strong>{{comment.positive}}</strong></div>{% endifnotequal %}
+                                {% ifnotequal comment.neutral 0 %}<div title="{{comment.neutral}}" class="progress-bar bg-info" role="progressbar" style="width: {%widthratio  comment.neutral 1 100 %}%" aria-valuenow="{%widthratio  comment.neutral 1 100 %}" aria-valuemin="0" aria-valuemax="100"><strong>{{comment.neutral}}</strong></div>{% endifnotequal %}
+                                {% ifnotequal comment.negative 0 %}<div title="{{comment.negative}}" class="progress-bar bg-danger" role="progressbar" style="width: {%widthratio  comment.negative 1 100 %}%" aria-valuenow="{%widthratio  comment.negative 1 100 %}" aria-valuemin="0" aria-valuemax="100"><strong>{{comment.negative}}</strong></div>{% endifnotequal %}
+                            </div>
+                        {% endifnotequal %} 
+                    </div>
+                </div>
+                <!-- ***** Testimonials Item End ***** -->
+                {% endfor %}
+               
+            </div>
+        </div>
+    </section>
+    <!-- ***** Testimonials End ***** -->
+        </div>
+    </section>
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+    <!-- block.super will get the content of the block from the parent template -->
+    {{ block.super }}
+    <script src="{% static '/js/post.js' %}"></script>
+{% endblock %}
+<!--<h1>{{ post.uriPost }} {{post.bioPost}} {{profile.followers}} {{post.nLikes}} {{post.nComments}}<br></h1>
+{% if nuoviCommenti %}
+<a href="{% url 'polls:updateNuoviCommenti' post.id %}"><button type="button">Click Me!</button></a>
+{% endif %}
+
+<ul>
+{% for comment in post.comments_set.all %}
+    <li>
+    {{comment.owner}}<br>
+    {{comment.comment_text}}<br>
+    {{comment.likesCount}} {{comment.sentiment}} {{comment.language}}
+    <li>
+
+{% endfor %}
+<ul>-->
+
