@@ -72,17 +72,10 @@ def getPostPage(request, pk):
         return render(request, 'polls/post.html', context)
     else :
         postDB = Post.objects.get(id=pk)
-        try:
-            post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
-        except LoginRequiredException: 
-                L.login("socialanalysiscld", "progettocloud123.")
-                post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
+        L.login("socialanalysiscld", "progettocloud123.")
         
-        try:
-            allComments = post.get_comments()
-        except LoginRequiredException: 
-                L.login("socialanalysiscld", "progettocloud123.")
-                allComments = post.get_comments()
+        post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)          
+        allComments = post.get_comments()
 
         for comment in allComments:
             if(remove_emoji(comment.text) != ''):       
@@ -428,19 +421,17 @@ def delete(request, profile_id):
 def updateNuoviCommenti(request, post_id):
         limit = 1
         postDB = Post.objects.get(id=post_id)
+        L.login("socialanalysiscld", "progettocloud123.")
+
         try:
             post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
         except LoginRequiredException: 
                 L.login("socialanalysiscld", "progettocloud123.")
                 post = instaloader.Post.from_shortcode(L.context, postDB.uriPost) 
         all_id_socail = All_Social_Id.objects.values_list('an_id_social', flat=True)
-        try:
-            allComments = post.get_comments()
-        except LoginRequiredException: 
-                L.login("socialanalysiscld", "progettocloud123.")
-                allComments = post.get_comments()
-                
-        for comment in allComments:
+        
+
+        for comment in post.get_comments():
             if remove_emoji(comment.text) != '':       
                 if comment.id not in all_id_socail:
                     if limit <= 100:
