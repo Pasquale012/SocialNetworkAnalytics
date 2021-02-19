@@ -22,7 +22,7 @@ import instaloader
 
 logger = logging.getLogger(__name__)
 #FUNCTION_APP = "http://localhost:7071/api/Sentiment"
-FUNCTION_APP = "https://socialanalyticsfnapp.azurewebsites.net/api/Sentiment?code=tN39Nh2QJ2VnvT0o19Mk8sakUiBXTCIIMvWds3NH721s7e9TrFlnhQ==&"
+FUNCTION_APP = "https://socialanalyticsfnapp.azurewebsites.net/api/Sentiment?code=tN39Nh2QJ2VnvT0o19Mk8sakUiBXTCIIMvWds3NH721s7e9TrFlnhQ=="
 L = instaloader.Instaloader()
 
 class IndexView(generic.ListView):
@@ -77,14 +77,22 @@ def getPostPage(request, pk):
         except LoginRequiredException: 
                 L.login("socialanalysiscld", "progettocloud123.")
                 post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
-        allComments = post.get_comments()
+        
+        try:
+            allComments = post.get_comments()
+        except LoginRequiredException: 
+                L.login("socialanalysiscld", "progettocloud123.")
+                allComments = post.get_comments()
+
         for comment in allComments:
             if(remove_emoji(comment.text) != ''):       
                 if limit <= 100:    
                     All_Social_Id(post=postDB, an_id_social=comment.id).save()
                     Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) < 200 else comment.text[:200] , owner = comment.owner.username, likesCount = comment.likes_count).save()
                     payload = {'idComm': comment.id}
-                    requests.post(FUNCTION_APP, data=json.dumps(payload))
+                    parameter = "&idComm="+str(comment.id)
+                    print(FUNCTION_APP+parameter)
+                    requests.post(FUNCTION_APP+parameter)
                     limit = limit + 1
                 else:
                     break
@@ -426,15 +434,23 @@ def updateNuoviCommenti(request, post_id):
                 L.login("socialanalysiscld", "progettocloud123.")
                 post = instaloader.Post.from_shortcode(L.context, postDB.uriPost) 
         all_id_socail = All_Social_Id.objects.values_list('an_id_social', flat=True)
-        allComments = post.get_comments()
+        try:
+            allComments = post.get_comments()
+        except LoginRequiredException: 
+                L.login("socialanalysiscld", "progettocloud123.")
+                allComments = post.get_comments()
+                
         for comment in allComments:
             if remove_emoji(comment.text) != '':       
                 if comment.id not in all_id_socail:
                     if limit <= 100:
                         All_Social_Id(post=postDB, an_id_social=comment.id).save()
                         Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) <= 200 else comment.text[:200], owner = comment.owner.username, likesCount = comment.likes_count).save()
-                        payload = {'idComm': comment.id}
-                        requests.post(FUNCTION_APP, data=json.dumps(payload))
+                        #payload = {'idComm': comment.id}
+                        #requests.post(FUNCTION_APP, data=json.dumps(payload))
+                        parameter = "&idComm="+str(comment.id)
+                        print(FUNCTION_APP+parameter)
+                        requests.post(FUNCTION_APP+parameter)
                         limit += 1
                 else:
                     comm = Comments.objects.get(id_social=comment.id)
@@ -442,8 +458,11 @@ def updateNuoviCommenti(request, post_id):
                         comm.likesCount = comment.likes_count 
                     if comm.comment_text != comment.text:
                         comm.comment_text = comment.text
-                        payload = {'idComm': comment.id}
-                        requests.post(FUNCTION_APP, data=json.dumps(payload))
+                        #payload = {'idComm': comment.id}
+                        #requests.post(FUNCTION_APP, data=json.dumps(payload))
+                        parameter = "&idComm="+str(comment.id)
+                        print(FUNCTION_APP+parameter)
+                        requests.post(FUNCTION_APP+parameter)
                     comm.save()
             if limit > 100:
                 break
