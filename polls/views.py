@@ -51,7 +51,6 @@ def getPostPage(request, pk):
     limit = 1
     postDB = get_object_or_404(Post, pk=pk)
     if(postDB.comments_set.count() > 0):
-        L = instaloader.Instaloader()
         try:
             post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
         except LoginRequiredException: 
@@ -72,9 +71,6 @@ def getPostPage(request, pk):
         }
         return render(request, 'polls/post.html', context)
     else :
-        L = instaloader.Instaloader()
-        L.login("SocialAnalysis010", "progettoreti2020")
-
         postDB = Post.objects.get(id=pk)
         try:
             post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)
