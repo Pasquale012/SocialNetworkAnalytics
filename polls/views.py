@@ -62,7 +62,6 @@ def getPostPage(request, pk):
         if postDB.nCommentsCount != post.comments:
             #totaleNuoviCommenti = post.comments - postDB.nComments
             nuoviCommenti = True
-        print(nuoviCommenti)
         postDB.save()
         context = {
             "post": postDB,
@@ -78,20 +77,24 @@ def getPostPage(request, pk):
         allComments = post.get_comments()
 
         for comment in allComments:
-            if(remove_emoji(comment.text) != ''):       
-                if limit <= 100:    
-                    All_Social_Id(post=postDB, an_id_social=comment.id).save()
-                    Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) < 200 else comment.text[:200] , owner = comment.owner.username, likesCount = comment.likes_count).save()
-                    payload = {'idComm': comment.id}
-                    parameter = "&idComm="+str(comment.id)
-                    print(FUNCTION_APP+parameter)
-                    requests.post(FUNCTION_APP+parameter)
-                    limit = limit + 1
-                else:
-                    break
+            if limit <= 100:
+                if(remove_emoji(comment.text) != ''):       
+                    if limit <= 100:    
+                        All_Social_Id(post=postDB, an_id_social=comment.id).save()
+                        Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) < 200 else comment.text[:200] , owner = comment.owner.username, likesCount = comment.likes_count).save()
+                        payload = {'idComm': comment.id}
+                        parameter = "&idComm="+str(comment.id)
+                        print(FUNCTION_APP+parameter)
+                        requests.post(FUNCTION_APP+parameter)
+                        limit = limit + 1
+            else:
+                break
+
         if postDB.nComments != post.comments :
             postDB.nComments = post.comments
         postDB.nCommentsCount += limit
+        if postDB.nCommentsCount != postDB.nComments:
+            nuoviCommenti = True
         if post.likes != postDB.nLikes:
             postDB.totalLikes = post.likes
         totPosSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").aggregate(Sum('positive'))['positive__sum']
@@ -106,7 +109,8 @@ def getPostPage(request, pk):
         postDB.save()
         L.close()
         context={
-            "post" : postDB
+            "post" : postDB,
+            "nuoviCommenti" : nuoviCommenti
 
         }
         return render(request, "polls/post.html", context)
@@ -460,7 +464,7 @@ def updateNuoviCommenti(request, post_id):
         
         if postDB.nComments != post.comments:
             postDB.nComments = post.comments
-        if limit != 1:
+        if limit > 1:
             postDB.nCommentsCount += limit
             totPosSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").aggregate(Sum('positive'))['positive__sum']
             totNeutralSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").aggregate(Sum('neutral'))['neutral__sum']

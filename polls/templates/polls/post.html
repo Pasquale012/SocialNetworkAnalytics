@@ -25,7 +25,7 @@
                     </div>
                     {% if nuoviCommenti %}
                         <div class="left-text text-center" style="font-size:20px">
-                            <p style="margin-bottom: 0; margin-top: 15px;"><small class="">Possono essere analizzati altri nuovi commenti!<br>Vuoi aggiornare e leggerli?</small></p>
+                            <p style="margin-bottom: 0; margin-top: 15px;"><small class="">Possono essere analizzati nuovi commenti!<br>Vuoi aggiornare e leggerli?</small></p>
                             <a href="{% url 'polls:updateNuoviCommenti' post.id %}"><button type="submit" class="btn btn-success">💬 Update</button></a>
                         </div>
                     {% endif %}
