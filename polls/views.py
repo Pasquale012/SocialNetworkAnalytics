@@ -442,10 +442,10 @@ def updateNuoviCommenti(request, post_id):
         
 
         for comment in post.get_comments():
-            if limit <= 20:
+            if limit <= 50:
                 if remove_emoji(comment.text) != '':       
                     if comment.id not in all_id_socail:
-                        if limit <= 20:
+                        if limit <= 50:
                             All_Social_Id(post=postDB, an_id_social=comment.id).save()
                             Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) <= 200 else comment.text[:200], owner = comment.owner.username, likesCount = comment.likes_count).save()
                             ids.append(comment.id)
