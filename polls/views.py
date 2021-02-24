@@ -21,8 +21,8 @@ from instaloader.exceptions import LoginRequiredException
 import instaloader
 
 logger = logging.getLogger(__name__)
-#FUNCTION_APP = "http://localhost:7071/api/SentimentFNAPP"
-FUNCTION_APP = "https://socialanalyticsfnapp.azurewebsites.net/api/Sentiment?code=tN39Nh2QJ2VnvT0o19Mk8sakUiBXTCIIMvWds3NH721s7e9TrFlnhQ=="
+FUNCTION_APP = "http://localhost:7071/api/SentimentFNAPP"
+#FUNCTION_APP = "https://socialanalyticsfnapp.azurewebsites.net/api/Sentiment?code=tN39Nh2QJ2VnvT0o19Mk8sakUiBXTCIIMvWds3NH721s7e9TrFlnhQ=="
 L = instaloader.Instaloader()
 
 class IndexView(generic.ListView):
@@ -77,19 +77,17 @@ def getPostPage(request, pk):
         ids = list()
         for comment in allComments:
             if limit <= 100:
-                if(remove_emoji(comment.text) != ''):       
+                text = remove_emoji(comment.text)
+                if(text != '' and len(text)>1 ):       
                     if limit <= 100:    
                         All_Social_Id(post=postDB, an_id_social=comment.id).save()
                         Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) < 200 else comment.text[:200] , owner = comment.owner.username, likesCount = comment.likes_count).save()
                         ids.append(comment.id)
-                        #parameter = "&idComm="+str(comment.id)
-                        #print(FUNCTION_APP+parameter)
-                        #requests.post(FUNCTION_APP+parameter)
                         limit = limit + 1
             else:
                 break
         
-        payload = "&ids="+str(ids)
+        payload = "?ids="+str(ids)
 
         requests.post(FUNCTION_APP+payload)
 
@@ -100,12 +98,16 @@ def getPostPage(request, pk):
             nuoviCommenti = True
         if post.likes != postDB.nLikes:
             postDB.totalLikes = post.likes
-        totPosSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").aggregate(Sum('positive'))['positive__sum']
-        totNeutralSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").aggregate(Sum('neutral'))['neutral__sum']
-        totNegativeSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").aggregate(Sum('negative'))['negative__sum']
-        totDivComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").count()
-        #print(totSentComm)
-        #print(totDivComm)
+        
+        status =['Invalid Lang']
+        totPosSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('positive'))['positive__sum']
+        totNeutralSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('neutral'))['neutral__sum']
+        totNegativeSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('negative'))['negative__sum']
+        totDivComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").count()
+        print(totPosSentComm)
+        print(totNeutralSentComm)
+        print(totNegativeSentComm)
+        print(totDivComm)
         postDB.avgPositiveSentiment = totPosSentComm/totDivComm if totDivComm != 0 and totPosSentComm != None else 0 
         postDB.avgNeutralSentiment = totNeutralSentComm/totDivComm if totDivComm != 0 and totNeutralSentComm != None else 0 
         postDB.avgNegativeSentiment = totNegativeSentComm/totDivComm if totDivComm != 0 and totNegativeSentComm != None else 0 
@@ -427,6 +429,7 @@ def delete(request, profile_id):
 
 def updateNuoviCommenti(request, post_id):
         limit = 1
+        ids=list()
         postDB = Post.objects.get(id=post_id)
         L.login("socialanalysiscld", "progettocloud123.")
 
@@ -439,37 +442,36 @@ def updateNuoviCommenti(request, post_id):
         
 
         for comment in post.get_comments():
-            if remove_emoji(comment.text) != '':       
-                if comment.id not in all_id_socail:
-                    if limit <= 100:
-                        All_Social_Id(post=postDB, an_id_social=comment.id).save()
-                        Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) <= 200 else comment.text[:200], owner = comment.owner.username, likesCount = comment.likes_count).save()
-                        parameter = "&idComm="+str(comment.id)
-                        print(FUNCTION_APP+parameter)
-                        requests.post(FUNCTION_APP+parameter)
-                        limit += 1
-                else:
-                    comm = Comments.objects.get(id_social=comment.id)
-                    if comm.likesCount != comment.likes_count:
-                        comm.likesCount = comment.likes_count 
-                    if comm.comment_text != comment.text:
-                        comm.comment_text = comment.text
-                        
-                        parameter = "&idComm="+str(comment.id)
-                        print(FUNCTION_APP+parameter)
-                        requests.post(FUNCTION_APP+parameter)
-                    comm.save()
-            if limit > 100:
+            if limit <= 20:
+                if remove_emoji(comment.text) != '':       
+                    if comment.id not in all_id_socail:
+                        if limit <= 20:
+                            All_Social_Id(post=postDB, an_id_social=comment.id).save()
+                            Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) <= 200 else comment.text[:200], owner = comment.owner.username, likesCount = comment.likes_count).save()
+                            ids.append(comment.id)
+                            limit += 1
+                    else:
+                        comm = Comments.objects.get(id_social=comment.id)
+                        if comm.likesCount != comment.likes_count:
+                            comm.likesCount = comment.likes_count 
+                        if comm.comment_text != comment.text:
+                            comm.comment_text = comment.text if len(comment.text) <= 200 else comment.text[:200]
+                            ids.append(comment.id)
+                        comm.save()
+            else:
                 break
         
+        payload = "?ids="+str(ids)
+        requests.post(FUNCTION_APP+payload)
+
         if postDB.nComments != post.comments:
             postDB.nComments = post.comments
         if limit > 1:
             postDB.nCommentsCount += limit
-            totPosSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").aggregate(Sum('positive'))['positive__sum']
-            totNeutralSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").aggregate(Sum('neutral'))['neutral__sum']
-            totNegativeSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").aggregate(Sum('negative'))['negative__sum']
-            totDivComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Not Analyzed").count()
+            totPosSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('positive'))['positive__sum']
+            totNeutralSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('neutral'))['neutral__sum']
+            totNegativeSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('negative'))['negative__sum']
+            totDivComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").count()
             postDB.avgPositiveSentiment = totPosSentComm/totDivComm if totDivComm != 0 and totPosSentComm != None else 0 
             postDB.avgNeutralSentiment = totNeutralSentComm/totDivComm if totDivComm != 0 and totNeutralSentComm != None else 0 
             postDB.avgNegativeSentiment = totNegativeSentComm/totDivComm if totDivComm != 0 and totNegativeSentComm != None else 0 
