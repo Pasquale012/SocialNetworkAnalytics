@@ -21,8 +21,8 @@ from instaloader.exceptions import LoginRequiredException
 import instaloader
 
 logger = logging.getLogger(__name__)
-#FUNCTION_APP = "http://localhost:7071/api/Sentiment"
-FUNCTION_APP = "https://socialanalyticsfnapp.azurewebsites.net/api/Sentiment?code=tN39Nh2QJ2VnvT0o19Mk8sakUiBXTCIIMvWds3NH721s7e9TrFlnhQ=="
+FUNCTION_APP = "http://localhost:7071/api/SentimentFNAPP"
+#FUNCTION_APP = "https://socialanalyticsfnapp.azurewebsites.net/api/Sentiment?code=tN39Nh2QJ2VnvT0o19Mk8sakUiBXTCIIMvWds3NH721s7e9TrFlnhQ=="
 L = instaloader.Instaloader()
 
 class IndexView(generic.ListView):
@@ -72,23 +72,26 @@ def getPostPage(request, pk):
     else :
         postDB = Post.objects.get(id=pk)
         L.login("socialanalysiscld", "progettocloud123.")
-        
         post = instaloader.Post.from_shortcode(L.context, postDB.uriPost)          
         allComments = post.get_comments()
-
+        ids = list()
         for comment in allComments:
             if limit <= 100:
                 if(remove_emoji(comment.text) != ''):       
                     if limit <= 100:    
                         All_Social_Id(post=postDB, an_id_social=comment.id).save()
                         Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) < 200 else comment.text[:200] , owner = comment.owner.username, likesCount = comment.likes_count).save()
-                        payload = {'idComm': comment.id}
-                        parameter = "&idComm="+str(comment.id)
-                        print(FUNCTION_APP+parameter)
-                        requests.post(FUNCTION_APP+parameter)
+                        ids.append(comment.id)
+                        #parameter = "&idComm="+str(comment.id)
+                        #print(FUNCTION_APP+parameter)
+                        #requests.post(FUNCTION_APP+parameter)
                         limit = limit + 1
             else:
                 break
+        
+        payload = "?ids="+str(ids)
+
+        requests.post(FUNCTION_APP+payload)
 
         if postDB.nComments != post.comments :
             postDB.nComments = post.comments
@@ -441,8 +444,6 @@ def updateNuoviCommenti(request, post_id):
                     if limit <= 100:
                         All_Social_Id(post=postDB, an_id_social=comment.id).save()
                         Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) <= 200 else comment.text[:200], owner = comment.owner.username, likesCount = comment.likes_count).save()
-                        #payload = {'idComm': comment.id}
-                        #requests.post(FUNCTION_APP, data=json.dumps(payload))
                         parameter = "&idComm="+str(comment.id)
                         print(FUNCTION_APP+parameter)
                         requests.post(FUNCTION_APP+parameter)
@@ -453,8 +454,7 @@ def updateNuoviCommenti(request, post_id):
                         comm.likesCount = comment.likes_count 
                     if comm.comment_text != comment.text:
                         comm.comment_text = comment.text
-                        #payload = {'idComm': comment.id}
-                        #requests.post(FUNCTION_APP, data=json.dumps(payload))
+                        
                         parameter = "&idComm="+str(comment.id)
                         print(FUNCTION_APP+parameter)
                         requests.post(FUNCTION_APP+parameter)
