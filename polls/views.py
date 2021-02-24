@@ -21,8 +21,8 @@ from instaloader.exceptions import LoginRequiredException
 import instaloader
 
 logger = logging.getLogger(__name__)
-FUNCTION_APP = "http://localhost:7071/api/SentimentFNAPP"
-#FUNCTION_APP = "https://socialanalyticsfnapp.azurewebsites.net/api/Sentiment?code=tN39Nh2QJ2VnvT0o19Mk8sakUiBXTCIIMvWds3NH721s7e9TrFlnhQ=="
+#FUNCTION_APP = "http://localhost:7071/api/SentimentFNAPP"
+FUNCTION_APP = "https://socialanalyticsfnapp.azurewebsites.net/api/Sentiment?code=tN39Nh2QJ2VnvT0o19Mk8sakUiBXTCIIMvWds3NH721s7e9TrFlnhQ=="
 L = instaloader.Instaloader()
 
 class IndexView(generic.ListView):
@@ -89,7 +89,7 @@ def getPostPage(request, pk):
             else:
                 break
         
-        payload = "?ids="+str(ids)
+        payload = "&ids="+str(ids)
 
         requests.post(FUNCTION_APP+payload)
 
