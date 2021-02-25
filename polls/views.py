@@ -66,7 +66,7 @@ def getPostPage(request, pk):
         context = {
             "post": postDB,
             "nuoviCommenti": nuoviCommenti,
-            #"totNuoviCommenti": totaleNuoviCommenti
+            'template' : "post.html"
         }
         return render(request, 'polls/post.html', context)
     else :
@@ -115,7 +115,9 @@ def getPostPage(request, pk):
         L.close()
         context={
             "post" : postDB,
-            "nuoviCommenti" : nuoviCommenti
+            "nuoviCommenti" : nuoviCommenti,
+            'template' : "post.html"
+
 
         }
         return render(request, "polls/post.html", context)
@@ -189,6 +191,7 @@ def getProfile(request, pk):
         'averangeLikes': round(p.totalLikes/p.postContacts,2) if p.postContacts!=0 else 0,
         'averangeComments':round(p.totalComments/p.postContacts, 2) if p.postContacts!=0 else 0,
         'engagementProfile': round(float(p.totalLikes + p.totalComments) / (p.followers * p.postContacts),2) if p.postContacts!=0 else 0,
+        'template' : "profile.html",
         'post_page': page_obj
     }
 
@@ -345,6 +348,8 @@ def insertInProfile(request, profile): # aggiungere la data da cui scaricare i p
         'averangeLikes': round(p.totalLikes/p.postContacts,2) if p.postContacts!=0 else 0,
         'averangeComments':round(p.totalComments/p.postContacts, 2) if p.postContacts!=0 else 0,
         'engagementProfile': round(float(p.totalLikes + p.totalComments) / (p.followers * p.postContacts),2) if p.postContacts!=0 else 0,
+        'template' : "post.html"
+
  
     }
     return response.HttpResponseRedirect(reverse('polls:profile', args=(p.id,)))

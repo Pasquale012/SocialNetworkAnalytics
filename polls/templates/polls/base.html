@@ -47,12 +47,38 @@
                         </a>
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->
+                        <!-- LOCAL                       
                         <ul class="nav">
+                            {% if template == "profile.html" or template == "post.html"  %}
+                            <li><a href="http://127.0.0.1:8000/polls/#welcome" class="active">Home</a></li>
+                            <li><a href="http://127.0.0.1:8000/polls/#accounts" >Account</a></li> 
+                            <li><a href="http://127.0.0.1:8000/polls/#graphics">Graphics</a></li>
+                            <li><a href="#contact-us">Contact Us</a></li>
+                            {% else %}
                             <li><a href="#welcome" class="active">Home</a></li>
-                            <li><a href="#accounts">Account</a></li>
+                            <li><a href="#accounts" >Account</a></li> 
                             <li><a href="#graphics">Graphics</a></li>
                             <li><a href="#contact-us">Contact Us</a></li>
+
+                            {% endif %}
                         </ul>
+                        AZURE SITE-->
+                        <ul class="nav">
+                            {% if template == "profile.html" or template == "post.html"  %}
+                            <li><a href="https://socialanalyticscld.azurewebsites.net/polls/#welcome" class="active">Home</a></li>
+                            <li><a href="https://socialanalyticscld.azurewebsites.net/polls/#accounts" >Account</a></li> 
+                            <li><a href="https://socialanalyticscld.azurewebsites.net/polls/#graphics">Graphics</a></li>
+                            <li><a href="#contact-us">Contact Us</a></li>
+                            {% else %}
+                            <li><a href="#welcome" class="active">Home</a></li>
+                            <li><a href="#accounts" >Account</a></li> 
+                            <li><a href="#graphics">Graphics</a></li>
+                            <li><a href="#contact-us">Contact Us</a></li>
+
+                            {% endif %}
+                        </ul>
+                        
+
                         <a class='menu-trigger'>
                             <span>Menu</span>
                         </a>
