@@ -188,7 +188,7 @@ def getProfile(request, pk):
         'totNuoviPost': totNuoviPost,
         'averangeLikes': round(p.totalLikes/p.postContacts,2) if p.postContacts!=0 else 0,
         'averangeComments':round(p.totalComments/p.postContacts, 2) if p.postContacts!=0 else 0,
-        #'averangeSentiment': round(avg/countSENTok, 2) if avg != None and countSENTok != 0 else 0.0,
+        'engagementProfile': round(float(p.totalLikes + p.totalComments) / (p.followers * p.postContacts),2) if p.postContacts!=0 else 0,
         'post_page': page_obj
     }
 
@@ -343,7 +343,9 @@ def insertInProfile(request, profile): # aggiungere la data da cui scaricare i p
         'profile' : p,
         'dateMancanti': result,
         'averangeLikes': round(p.totalLikes/p.postContacts,2) if p.postContacts!=0 else 0,
-        'averangeComments':round(p.totalComments/p.postContacts, 2) if p.postContacts!=0 else 0 
+        'averangeComments':round(p.totalComments/p.postContacts, 2) if p.postContacts!=0 else 0,
+        'engagementProfile': round(float(p.totalLikes + p.totalComments) / (p.followers * p.postContacts),2) if p.postContacts!=0 else 0,
+ 
     }
     return response.HttpResponseRedirect(reverse('polls:profile', args=(p.id,)))
 

@@ -72,13 +72,13 @@
         <div class="content">
             <div class="container">
                 <div class="row">
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-3 col-md-6 col-sm-12">
                         <div class="count-item decoration-bottom">
                             <strong>{{profile.postContacts}}</strong>
                             <span>Post Analizzati</span>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-3 col-md-6 col-sm-12">
                     {% ifequal averangeLikes 0 %}
                         <div class="no-count-item decoration-top">
                             <strong id="noLikesData">No Post</strong>
@@ -91,7 +91,7 @@
                         </div>
                     {% endifequal %}
                     </div>
-                    <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="col-lg-3 col-md-6 col-sm-12">
                     {% ifequal averangeComments 0 %}
                         <div class="no-count-item decoration-top">
                             <strong id="noLikesData" >No Post</strong>
@@ -101,6 +101,19 @@
                         <div class="count-item decoration-top">
                             <strong id="noLikesData">{{averangeComments|intcomma}}</strong>
                             <span>Media Commenti per Post</span>
+                        </div>
+                    {% endifequal %}
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                    {% ifequal engagementProfile 0 %}
+                        <div class="no-count-item decoration-top">
+                            <strong id="noLikesData" >No Post</strong>
+                            <span>Media Like per Post</span>
+                        </div>
+                    {% else %}
+                        <div class="no-count-item decoration-top">
+                            <strong id="noLikesData">{%widthratio  engagementProfile 1 100%} %</strong>
+                            <span>Engagement</span>
                         </div>
                     {% endifequal %}
                     </div>
