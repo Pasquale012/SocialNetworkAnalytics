@@ -59,13 +59,12 @@ def getPostPage(request, pk):
 
         if post.likes != postDB.nLikes:
             postDB.totalLikes = post.likes
-        if postDB.nCommentsCount != post.comments:
-            #totaleNuoviCommenti = post.comments - postDB.nComments
-            nuoviCommenti = True
+        #if postDB.nCommentsCount != post.comments:
+            #nuoviCommenti = True
         postDB.save()
         context = {
             "post": postDB,
-            "nuoviCommenti": nuoviCommenti,
+            #"nuoviCommenti": nuoviCommenti,
             'template' : "post.html"
         }
         return render(request, 'polls/post.html', context)
@@ -79,35 +78,27 @@ def getPostPage(request, pk):
             if limit <= 100:
                 text = remove_emoji(comment.text)
                 if(text != '' and len(text)>1 ):       
-                    if limit <= 100:    
+                    if limit <= 100:
                         All_Social_Id(post=postDB, an_id_social=comment.id).save()
                         Comments(post=postDB, id_social=comment.id, comment_text=comment.text if len(comment.text) < 200 else comment.text[:200] , owner = comment.owner.username, likesCount = comment.likes_count).save()
                         ids.append(comment.id)
                         limit = limit + 1
             else:
                 break
-        
         payload = "&ids="+str(ids)
 
         requests.post(FUNCTION_APP+payload)
 
         if postDB.nComments != post.comments :
             postDB.nComments = post.comments
-        postDB.nCommentsCount += limit
-        if postDB.nCommentsCount != postDB.nComments:
-            nuoviCommenti = True
+        postDB.nCommentsCount = postDB.nCommentsCount + limit
         if post.likes != postDB.nLikes:
             postDB.totalLikes = post.likes
         
-        status =['Invalid Lang']
         totPosSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('positive'))['positive__sum']
         totNeutralSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('neutral'))['neutral__sum']
         totNegativeSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('negative'))['negative__sum']
         totDivComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").count()
-        print(totPosSentComm)
-        print(totNeutralSentComm)
-        print(totNegativeSentComm)
-        print(totDivComm)
         postDB.avgPositiveSentiment = totPosSentComm/totDivComm if totDivComm != 0 and totPosSentComm != None else 0 
         postDB.avgNeutralSentiment = totNeutralSentComm/totDivComm if totDivComm != 0 and totNeutralSentComm != None else 0 
         postDB.avgNegativeSentiment = totNegativeSentComm/totDivComm if totDivComm != 0 and totNegativeSentComm != None else 0 
@@ -115,7 +106,7 @@ def getPostPage(request, pk):
         L.close()
         context={
             "post" : postDB,
-            "nuoviCommenti" : nuoviCommenti,
+            #"nuoviCommenti" : nuoviCommenti,
             'template' : "post.html"
 
 
@@ -171,15 +162,15 @@ def getProfile(request, pk):
     if str(datetime.now().year) not in result:
         thisYear = True
     
-    
+    page_obj= None
+    if(p.isPrivate is False):
+        paginator = Paginator(post, 200)
 
-    paginator = Paginator(post, 200)
-
-    page_number = request.GET.get('page')
-    if page_number is None:
-        page_obj = paginator.get_page(1)
-    else:
-        page_obj = paginator.get_page(page_number)
+        page_number = request.GET.get('page')
+        if page_number is None:
+            page_obj = paginator.get_page(1)
+        else:
+            page_obj = paginator.get_page(page_number)
 
     context={
         'profile': p,
@@ -192,7 +183,7 @@ def getProfile(request, pk):
         'averangeComments':round(p.totalComments/p.postContacts, 2) if p.postContacts!=0 else 0,
         'engagementProfile': round(float(p.totalLikes + p.totalComments) / (p.followers * p.postContacts),2) if p.postContacts!=0 else 0,
         'template' : "profile.html",
-        'post_page': page_obj
+        'post_page': page_obj if page_obj is not None else None
     }
 
     return render(request, "polls/profile.html", context)
@@ -306,7 +297,6 @@ def insertInProfile(request, profile): # aggiungere la data da cui scaricare i p
         profile = instaloader.Profile.from_username(L.context, p.username)
     #
     #L = instaloader.Instaloader()
-    
     #profile = instaloader.Profile.from_username(L.context, p.username)
     if p.isPrivate is False:
         if profile.is_private:
@@ -348,7 +338,7 @@ def insertInProfile(request, profile): # aggiungere la data da cui scaricare i p
         'averangeLikes': round(p.totalLikes/p.postContacts,2) if p.postContacts!=0 else 0,
         'averangeComments':round(p.totalComments/p.postContacts, 2) if p.postContacts!=0 else 0,
         'engagementProfile': round(float(p.totalLikes + p.totalComments) / (p.followers * p.postContacts),2) if p.postContacts!=0 else 0,
-        'template' : "post.html"
+        'template' : "post.html",
 
  
     }
@@ -447,7 +437,6 @@ def updateNuoviCommenti(request, post_id):
                 post = instaloader.Post.from_shortcode(L.context, postDB.uriPost) 
         all_id_socail = All_Social_Id.objects.values_list('an_id_social', flat=True)
         
-
         for comment in post.get_comments():
             if limit <= 50:
                 if remove_emoji(comment.text) != '':       
@@ -474,7 +463,7 @@ def updateNuoviCommenti(request, post_id):
         if postDB.nComments != post.comments:
             postDB.nComments = post.comments
         if limit > 1:
-            postDB.nCommentsCount += limit
+            postDB.nCommentsCount =  postDB.nCommentsCount + limit
             totPosSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('positive'))['positive__sum']
             totNeutralSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('neutral'))['neutral__sum']
             totNegativeSentComm = Comments.objects.filter(post_id = postDB.id).exclude(sentiment = "Invalid Lang").aggregate(Sum('negative'))['negative__sum']

@@ -293,3 +293,21 @@ var myBarChart = new Chart(ctx, {
 
 return myBarChart
 }
+
+function submitFunction(button){
+
+    item ='<p style="margin-top:50px;width:500px;font-size:24px">STO ANALIZZANDO IL PROFILO!<br>Insieme ad esso i suoi post! Tra poco avrai una stima di tutti i dati analizzati 😊</p>'
+
+    $(".jumper").append(item)
+    console.log("Dovrebbe andare il preloader prima")
+    $("#preloader").animate({
+        'opacity': '100'
+    }, 100, function(){
+        $("#preloader").css({'visibility': 'visible'}).fadeIn();
+    
+    });
+    
+
+    $("#form-submit").submit();
+
+}

@@ -11,7 +11,7 @@
     <meta name="author" content="">
     <link href="https://fonts.googleapis.com/css?family=Raleway:100,300,400,500,700,900" rel="stylesheet">
 
-    <title>Social Analysis</title>
+    <title>Social Network Analytics</title>
 
     <!-- Additional CSS Files -->
     {% load static %}
@@ -19,7 +19,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.css' %}">
     <link rel="stylesheet" href="{% static 'css/social-analysis.css' %}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-
+    <link rel="shortcut icon" type="image/x-icon"  href="{% static '/images/logoTOPAGE.png' %}" sizes="64x364" />
 
     </head>
     
@@ -30,9 +30,10 @@
         <div class="jumper">
             <div></div>
             <div></div>
-            <div></div>
+            <div></div> 
         </div>
     </div>
+    
     <!-- ***** Preloader End ***** -->
 
     <!-- ***** Header Area Start ***** -->
@@ -42,8 +43,8 @@
                 <div class="col-12">
                     <nav class="main-nav">
                         <!-- ***** Logo Start ***** -->
-                        <a href="{% url 'polls:index' %}" class="logo">
-                            <img src="" alt="Social Analysis"/>
+                        <a style="width:50%"href="{% url 'polls:index' %}" class="logo">
+                            <img style="width:50%" src="{% static '/images/logo.png' %}" alt="Social Analysis"/>
                         </a>
                         <!-- ***** Logo End ***** -->
                         <!-- ***** Menu Start ***** -->

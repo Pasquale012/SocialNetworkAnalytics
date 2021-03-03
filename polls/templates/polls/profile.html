@@ -5,6 +5,7 @@
 
 {%block content%}
   
+    
    <!-- ***** Features Big Item Start ***** -->
     <section class="section padding-top-70 padding-bottom-0 " id="features">
         <div class="container">
@@ -25,27 +26,31 @@
                                                                                     {% endif %}
                                                                                     </small> <strong>{{profile.followees|intword}}</strong> <small>Followees</small>
                                                                                     </small> <strong>{{profile.allPost|intword}}</strong> <small>Posts</small><br><br>
-                                                                                    <small style="color:green">Positive: <strong>{{profile.avgPositiveSentiment|stringformat:".2f"}}</strong></small>
-                                                                                    <small>Neutral: <strong>{{profile.avgNeutralSentiment|stringformat:".2f"}}</strong></small>
-                                                                                    <small style="color:red">Negative: <strong>{{profile.avgNegativeSentiment|stringformat:".2f"}}</strong></small></p>
-                                                                                    
+                                                                                    {% if  profile.avgPositiveSentiment != 0 and profile.avgNeutralSentiment != 0 and profile.avgNegativeSentiment != 0%}
+                                                                                    <small style="color:green">Positive: <strong>{%widthratio  profile.avgPositiveSentiment 1 100 %}%</strong></small>
+                                                                                    <small>Neutral: <strong>{%widthratio  profile.avgNeutralSentiment 1 100 %}%</strong></small>
+                                                                                    <small style="color:red">Negative: <strong>{%widthratio  profile.avgNegativeSentiment 1 100 %}%</strong></small>
+                                                                                    {% else %}
+                                                                                    <small>Non hai analizzato ancora nessun Post, che aspetti?</small>
+                                                                                    {% endif %}
+                                                                                    </p>
                     </div>
                     {% ifequal dateMancanti "NOTALL"%} <!--Questo profilo è privato!-->
                         <div class="left-text text-center" style="font-size:20px">
                             <p style="margin-bottom: 0; margin-top: 15px;"><small class="">Questo profilo è privato!<br></small></p>
-                            <a href="{% url 'polls:insertInProfile' profile.username %}"><button type="submit" class="btn btn-success">🔓 Controlla se non lo è più</button></a>
+                            <a href="{% url 'polls:insertInProfile' profile.username %}"><button onclick="submitPrivate(this)"type="" class="btn btn-success">🔓 Controlla se non lo è più</button></a>
                         </div>
                     {% endifequal %}
                     {%if dateMancanti != "ALL" and dateMancanti != "NOTALL"%}<!--Questo profilo è privato!-->
                             <div class="left-text text-center" style="font-size:20px">
                                 <p style="margin-bottom: 0; margin-top: 15px;"><small class="">Questo profilo contiene post relativi a queste date: <br>{{profile.nDatePostSaved}}<br></small></p>
-                                <form action="{% url 'polls:insertInProfile' profile.username%}" method="post"> 
+                                <form action="{% url 'polls:insertInProfile' profile.username%}" id="form-submit" method="post"> 
                                 {% csrf_token %}
                                 <small style="font-size:15px;">Seleziona altre date!</small><br>
                                     {% for date in dateMancanti %}
                                         <label class="checkbox-inline"><input type="checkbox" id="{{date}}" name="checkYear" value="{{date}}" style="margin-left:10px;"><small style="margin-left:5px;margin-right:5px; color:#777">{{date}}</small></label>
                                     {% endfor %}
-                                <button type="submit" class="btn btn-success">Update</button>
+                                <button type="" onclick="submitNEWPOST(this)" class="btn btn-success">Update</button>
                                 </form>
                             </div>
                     {% endif %}
@@ -163,18 +168,16 @@
                                         <strong>{{post.nComments}}</strong>
                                         <p style="display:inline">Commenti</p>
                             </div>
-                            <div class="decoration-bottom text-center">
-                                    <strong>
-                                        {%if post.avgSentiment < 0.5 %}<span style="color:red">{{post.avgSentiment|stringformat:".2f"}}</span>
-                                        {% elif post.avgSentiment == 0.5 %}<span style="color:yellow">{{post.avgSentiment|stringformat:".2f"}}</span>
-                                        {% else %}<span style="color:green">{{post.avgSentiment|stringformat:".2f"}}</span>
-                                        {% endif %}
-                                    </strong>
-                                        <p style="display:inline">Sentiment del Post</p>
+                            {% if post.avgPositiveSentiment != None and post.avgNeutralSentiment != None and post.avgNegativeSentiment != None and post.avgPositiveSentiment != 0.0 and post.avgNeutralSentiment != 0.0 and post.avgNegativeSentiment != 0.0%}
+                            <div style="margin-right: 30px;margin-left: 30px;margin-top: 5px;"class="progress">
+                                {% ifnotequal post.avgPositiveSentiment 0 %}  <div title="{{post.avgPositiveSentiment|stringformat:".2f"}}" class="progress-bar bg-success" role="progressbar" style="width: {%widthratio  post.avgPositiveSentiment 1 100%}%" aria-valuenow="{%widthratio  post.avgPositiveSentiment 1 100 %}" aria-valuemin="0" aria-valuemax="100"><strong>{%widthratio  post.avgPositiveSentiment 1 100 %}%</strong></div>{% endifnotequal %}
+                                {% ifnotequal post.avgNeutralSentiment 0 %}<div title="{{post.avgNeutralSentiment|stringformat:".2f"}}" class="progress-bar bg-info" role="progressbar" style="width: {%widthratio  post.avgNeutralSentiment 1 100 %}%" aria-valuenow="{%widthratio  post.avgNeutralSentiment 1 100 %}" aria-valuemin="0" aria-valuemax="100"><strong>{%widthratio  post.avgNeutralSentiment 1 100 %}%</strong></div>{% endifnotequal %}
+                                {% ifnotequal post.avgNegativeSentiment 0 %}<div title="{{post.avgNegativeSentiment|stringformat:".2f"}}" class="progress-bar bg-danger" role="progressbar" style="width: {%widthratio  post.avgNegativeSentiment 1 100 %}%" aria-valuenow="{%widthratio  post.avgNegativeSentiment 1 100 %}" aria-valuemin="0" aria-valuemax="100"><strong>{%widthratio  post.avgNegativeSentiment 1 100 %}%</strong></div>{% endifnotequal %}
                             </div>
+                            {% endif %} 
                         </div>
                         <div class="pricing-footer">
-                            <a href="{% url 'polls:post' post.id %}" class="main-button">Go to post</a> <!--pagina del post + commenti e FUNCTION APP-->
+                            <a href="{% url 'polls:post' post.id %}" onclick="submitGOTOPOST()" class="main-button">Go to post</a> <!--pagina del post + commenti e FUNCTION APP-->
                         </div>
                     </div>
                 </div>

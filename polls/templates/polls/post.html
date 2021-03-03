@@ -23,12 +23,12 @@
                     <div class="left-text text-center" style="font-size:25px">
                         <p><small>👍</small> <strong>{{post.nLikes}}</strong> <small>💬</small> <strong>{{post.nComments}}</strong> </p>
                     </div>
-                    {% if nuoviCommenti %}
+                    <!--{% if nuoviCommenti %}
                         <div class="left-text text-center" style="font-size:20px">
                             <p style="margin-bottom: 0; margin-top: 15px;"><small class="">Possono essere analizzati nuovi commenti!<br>Vuoi aggiornare e leggerli?</small></p>
-                            <a href="{% url 'polls:updateNuoviCommenti' post.id %}"><button type="submit" class="btn btn-success">💬 Update</button></a>
+                            <a href="{% url 'polls:updateNuoviCommenti' post.id %}"><button type="submit" onclick="submitNEWCOMMENT()" class="btn btn-success">💬 Update</button></a>
                         </div>
-                    {% endif %}
+                    {% endif %} -->
                     <div class="left-text text-center" style="font-size:20px">
                         <!--<p style="margin-bottom: 0; margin-top: 15px;"><small>Media Sentiment Commenti:</small> {%if post.avgSentiment < 0.5 %}<span style="color:red"><strong>{{post.avgSentiment}}❤️</strong></span>
                                                                                                                 {% elif post.avgSentiment == 0.5 %}<span style="color:yellow"><strong>{{post.avgSentiment}}💛<strong></span>
@@ -58,7 +58,8 @@
                 <div class="col-lg-12">
                     <div class="center-heading" style="margin-bottom:20px">
                         <h2 class="section-title">Commenti ⬇️</h2>
-                        <p>Vengono riportati sotto i commenti con relativa analisi del sentiment.</p>
+                        <p>Vengono riportati sotto i commenti con relativa analisi del sentiment.<br>
+                        <small>Potrebbero essere presenti <strong>{{totNuoviPost}}</strong> nuovi commenti dall'ultima analisi, vuoi aggiornare? -></small> <a href="{% url 'polls:updateNuoviCommenti' post.id %}" onclick="submitNEWCOMMENT()">🔄</a></p>
                     </div>
                 </div>
             <!-- ***** Section Title End ***** -->
@@ -66,6 +67,7 @@
             <div class="row">
             {% for comment in post.comments_set.all %}
                 <!-- ***** Testimonials Item Start ***** -->
+                {% if comment.sentiment != "Invalid Lang" %}
                 <div class="col-lg-4 col-md-6 col-sm-12">
                     <div class="team-item">
                         <div class="team-content">
@@ -80,7 +82,7 @@
                                 
                             </div>
                         </div>
-                        {% ifnotequal comment.sentiment|upper "NOT ANALYZED" %}
+                        {% ifnotequal comment.sentiment|upper "INVALID LANG" %}
                           <div style="margin-right: 30px;margin-left: 30px;margin-top: 5px;"class="progress">
                                 {% ifnotequal comment.positive 0 %}  <div title="{{comment.positive}}" class="progress-bar bg-success" role="progressbar" style="width: {%widthratio  comment.positive 1 100%}%" aria-valuenow="{%widthratio  comment.positive 1 100 %}" aria-valuemin="0" aria-valuemax="100"><strong>{{comment.positive}}</strong></div>{% endifnotequal %}
                                 {% ifnotequal comment.neutral 0 %}<div title="{{comment.neutral}}" class="progress-bar bg-info" role="progressbar" style="width: {%widthratio  comment.neutral 1 100 %}%" aria-valuenow="{%widthratio  comment.neutral 1 100 %}" aria-valuemin="0" aria-valuemax="100"><strong>{{comment.neutral}}</strong></div>{% endifnotequal %}
@@ -90,9 +92,11 @@
                     </div>
                 </div>
                 <!-- ***** Testimonials Item End ***** -->
+                 {% endif %}
                 {% endfor %}
                
             </div>
+           
         </div>
     </section>
     <!-- ***** Testimonials End ***** -->

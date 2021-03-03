@@ -44,7 +44,7 @@
                 <!-- ***** Contact Form Start ***** -->
                 <div class="col-lg-12">
                     <div class="welcome-form">
-                        <form  action="{% url 'polls:insert' %}" method="post">
+                        <form  action="{% url 'polls:insert' %}" id="form-submit" method="post">
                             {% csrf_token %}
                           <div class="row">
                             <div class="col-lg-12 col-md-12 col-sm-12">
@@ -73,7 +73,7 @@
                             <div class="row">
                             <div class="col-lg-12 text-center">
                               <fieldset>
-                                <button type="submit" class="main-button">Analyze!</button>
+                                <button type=""  onclick="submitFunction(this)" class="main-button">Analyze!</button>
                               </fieldset>
                             </div>
                           </div>
